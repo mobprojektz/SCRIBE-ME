@@ -1,3 +1,4 @@
+import {captureUsage, recordUsage, refreshStats} from './stats.js';
 // SCRIBE-ME automatic import fallback — no server uploads or automatic speaker identification.
 // SCRIBE-ME: static, single-file client-side transcription. No upload endpoint.
 const $=id=>document.getElementById(id);
@@ -133,6 +134,7 @@ function appendResult(result,offset,length){
  return segments.length-originalCount;
 }
 async function startManual(){if(busy||!selectedFile)return;busy=true;const button=$('start');button.disabled=true;$('remove').disabled=true;$('model').disabled=true;$('engine').disabled=true;button.textContent='Transcribing…';let done=false;
+const usageEvent=captureUsage(selectedFile,$('model').value);
 try{
  status('Preparing recording…',0);diagnostic('Starting a new transcription.');$('count').textContent='0 sections';
  let ff=null, buffer=null, importMethod='native';
@@ -193,7 +195,7 @@ try{
  }
  if(!segments.length)throw new Error('AI returned no usable transcript text. Try Fast · Tiny / CPU, and see the diagnostic line below the progress bar.');
  render();if(!segments.length||$('download').disabled||!$('transcript').querySelector('.segment'))throw new Error('Transcript could not be displayed. No success was reported.');done=true;diagnostic('SUCCESS: '+segments.length+' transcript sections displayed; TXT download is enabled. Audio import: '+(ff?'automatic conversion':'browser decoder')+'.');status('Transcript ready — review before quoting',100);$('footer-note').textContent=segments.length+' transcript sections · review text before publication';notice('Transcription complete. Review and download your TXT file.');
-}catch(err){console.error(err);diagnostic('FAILED: '+(err?.message||'Transcription failed'));status('Error: '+(err?.message||'Transcription failed'),0);notice((err?.message||'Something went wrong')+' Check the error details below.')}finally{busy=false;button.disabled=!selectedFile;button.textContent=done?'↻  Transcribe again':'✳  Try transcription again';$('remove').disabled=false;$('model').disabled=false;$('engine').disabled=false;decoded=null;if(audioContext){audioContext.close().catch(()=>{});audioContext=null}if(ffmpegInstance){ffmpegInstance.deleteFile('scribe-input').catch(()=>{})}render()}}
+}catch(err){console.error(err);diagnostic('FAILED: '+(err?.message||'Transcription failed'));status('Error: '+(err?.message||'Transcription failed'),0);notice((err?.message||'Something went wrong')+' Check the error details below.')}finally{void recordUsage(usageEvent,done,duration);busy=false;button.disabled=!selectedFile;button.textContent=done?'↻  Transcribe again':'✳  Try transcription again';$('remove').disabled=false;$('model').disabled=false;$('engine').disabled=false;decoded=null;if(audioContext){audioContext.close().catch(()=>{});audioContext=null}if(ffmpegInstance){ffmpegInstance.deleteFile('scribe-input').catch(()=>{})}render()}}
 $('start').addEventListener('click',startManual);
 function transcriptText(){return segments.map(s=>`[${stamp(s.start)}] ${speakers[s.speaker]||'Unassigned'}: ${s.text.trim()}`).join('\n\n')}
 function render(){const t=$('transcript');t.replaceChildren();$('copy').disabled=!segments.length;$('download').disabled=!segments.length;$('add-speaker').disabled=!segments.length;$('search-area').style.display=segments.length?'flex':'none';
@@ -206,3 +208,5 @@ $('copy').addEventListener('click',async()=>{try{await navigator.clipboard.write
 $('download').addEventListener('click',()=>{if(!segments.length)return;const base=(selectedFile?.name||'transcript').replace(/\.[^.]+$/,'').replace(/[^a-zA-Z0-9._ -]+/g,'_');const blob=new Blob([transcriptText()+'\n'],{type:'text/plain;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=base+'-transcript.txt';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),30000);notice('TXT download started.')});
 $('player').addEventListener('error',()=>{if(selectedFile)notice('This browser may not support playback for this file format. Try MP3, M4A or WAV.')});
 if(!navigator.gpu){$('model-note').textContent+=' This browser may use slower CPU processing because WebGPU is unavailable.'}
+
+void refreshStats();
