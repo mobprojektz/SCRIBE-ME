@@ -1,11 +1,55 @@
-# SCRIBE-ME — Auto Import v2.1
+Key features:
 
-Browser-based transcription on GitHub Pages. Recordings remain on the user’s device.
+Supports MP3, M4A, WAV, MOV, MP4 and various other audio and video formats.
 
-### Upgrade
-Upload all files from this package, preserving paths including `.github/workflows/deploy.yml`. The existing GitHub Actions workflow builds the project and publishes the `dist` folder.
+Automatically attempts to convert incompatible recordings.
 
-### Import handling
-Audio files of 64 MB or less are first sent to the browser decoder. If decoding fails, SCRIBE-ME attempts to convert the recording locally using FFmpeg.wasm. Files over 64 MB bypass full browser decoding and are converted in 25-second portions. No colleague needs to manually convert files. The first converter run downloads a WebAssembly runtime and requires internet access.
+Three transcription accuracy settings.
 
-**Limitations:** Browser RAM constraints and codec availability remain. Large video or 300 MB files are not guaranteed to process. Tested syntax only; no complete browser or GitHub Actions build verified. No speaker diarisation; labels are manual.
+Editable transcripts directly on the website.
+
+Search function to find specific words, names or phrases within a transcript.
+
+Clickable timestamps to jump to sections of the original recording.
+
+Built-in audio playback.
+
+Manually assign and add speaker labels.
+
+Copy the entire transcript or download it as a .txt file.
+
+Transcription settings:
+
+Fast: Quicker processing but lower accuracy. Useful for short recordings or getting a general understanding of a conversation. Best used with very clear and crisp audio.
+
+Balanced (default): Provides a reasonable level of accuracy with moderate processing times.
+
+Accurate: Provides the highest level of transcription accuracy, which is found to be comparable to Otter.ai. It does take a little longer to process depending on your computer.
+
+"Accurate" is recommended overall if you're transcribing interviews for an article.
+
+How to use it:
+
+Upload or drag and drop your recording onto the website.
+
+Select your preferred transcription setting.
+
+Leave the processing device set to Automatic and click Transcribe.
+
+Once completed, review, search or edit your transcript.
+
+Assign speaker labels if needed. Two speakers are available by default, but you can add more by clicking + Add speaker label. Unfortunately the tool cannot currently do it on it's own.
+
+Copy or download your transcript.
+
+The first transcription may take a little longer as your browser needs to download the backend model.
+
+Processing times will also vary depending on your computer, recording length and selected accuracy setting.
+
+All recordings are processed directly on your device, meaning no interviews or transcripts are uploaded to a server or stored online, ever.
+
+Please keep the browser tab open while transcribing and remember to download your transcript before closing the page.
+
+As with any AI transcription tool, make sure to check quotes against the original recording before publication.
+
+Feel free to give it a go and please let Joey know if you encounter any issues or have suggestions for improvements!
